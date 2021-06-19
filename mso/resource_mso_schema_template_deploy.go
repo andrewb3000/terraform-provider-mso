@@ -3,7 +3,7 @@ package mso
 import (
 	"fmt"
 
-	"github.com/ciscoecosystem/mso-go-client/client"
+	"github.com/andrewb3000/mso-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )

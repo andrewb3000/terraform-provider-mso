@@ -9,12 +9,12 @@ Requirements
 
 ## Building The Provider ##
 Clone this repository to: `$GOPATH/src/github.com/ciscoecosystem/terraform-provider-mso`.
-Clone mso-go-client to `$GOPATH/src/github.com/ciscoecosystem/mso-go-client`.
+Clone mso-go-client to `$GOPATH/src/github.com/andrewb3000/mso-go-client`.
 
 ```sh
 $ mkdir -p $GOPATH/src/github.com/ciscoecosystem; cd $GOPATH/src/github.com/ciscoecosystem
 $ git clone https://github.com/ciscoecosystem/terraform-provider-mso.git
-$ git clone https://github.com/ciscoecosystem/mso-go-client.git
+$ git clone https://github.com/andrewb3000/mso-go-client.git
 ```
 
 

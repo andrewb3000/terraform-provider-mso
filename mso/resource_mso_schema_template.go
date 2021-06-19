@@ -5,8 +5,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/ciscoecosystem/mso-go-client/client"
-	"github.com/ciscoecosystem/mso-go-client/models"
+	// "github.com/andrewb3000/mso-go-client/client"
+	// "github.com/andrewb3000/mso-go-client/models"
+	"github.com/andrewb3000/mso-go-client/client"
+	"github.com/andrewb3000/mso-go-client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -51,6 +53,11 @@ func resourceMSOSchemaTemplate() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.StringLenBetween(1, 1000),
 			},
+			"template_type": &schema.Schema{
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringLenBetween(1, 1000),
+			},
 		}),
 	}
 }
@@ -87,6 +94,7 @@ func resourceMSOSchemaTemplateImport(d *schema.ResourceData, m interface{}) ([]*
 	d.Set("name", models.StripQuotes(dataCon.S("name").String()))
 	d.Set("display_name", models.StripQuotes(dataCon.S("displayName").String()))
 	d.Set("tenant_id", models.StripQuotes(dataCon.S("tenantId").String()))
+	d.Set("template_type", models.StripQuotes(dataCon.S("templateType").String()))
 
 	log.Printf("[DEBUG] %s: Import finished successfully", d.Id())
 	return []*schema.ResourceData{d}, nil
@@ -98,8 +106,9 @@ func resourceMSOSchemaTemplateCreate(d *schema.ResourceData, m interface{}) erro
 	Name := d.Get("name").(string)
 	tenantId := d.Get("tenant_id").(string)
 	displayName := d.Get("display_name").(string)
+	templateType := d.Get("template_type").(string)
 
-	schematemplate := models.NewSchemaTemplate("add", "/templates/-", tenantId, Name, displayName)
+	schematemplate := models.NewSchemaTemplate("add", "/templates/-", tenantId, Name, displayName, templateType)
 
 	cont, err := msoClient.PatchbyID(fmt.Sprintf("api/v1/schemas/%s", schemaId), schematemplate)
 	if err != nil {
@@ -132,6 +141,7 @@ func resourceMSOSchemaTemplateRead(d *schema.ResourceData, m interface{}) error 
 	stateTenantId := d.Get("tenant_id").(string)
 	stateTemplateName := d.Get("name").(string)
 	stateTemplateDisplayName := d.Get("display_name").(string)
+	stateTemplateType := d.Get("template_type").(string)
 
 	found := false
 
@@ -143,12 +153,14 @@ func resourceMSOSchemaTemplateRead(d *schema.ResourceData, m interface{}) error 
 		apiTenantId := models.StripQuotes(tempCont.S("tenantId").String())
 		apiTemplateName := models.StripQuotes(tempCont.S("name").String())
 		apiTemplateDisplayName := models.StripQuotes(tempCont.S("displayName").String())
+		apiTemplateType := models.StripQuotes(tempCont.S("templateType").String())
 
-		if apiTenantId == stateTenantId && apiTemplateName == stateTemplateName && apiTemplateDisplayName == stateTemplateDisplayName {
+		if apiTenantId == stateTenantId && apiTemplateName == stateTemplateName && apiTemplateDisplayName == stateTemplateDisplayName && apiTemplateType == stateTemplateType {
 			d.SetId(apiTemplateName)
 			d.Set("tenant_id", apiTenantId)
 			d.Set("name", apiTemplateName)
 			d.Set("display_name", apiTemplateDisplayName)
+			d.Set("template_type", apiTemplateType)
 			found = true
 		}
 
@@ -159,6 +171,7 @@ func resourceMSOSchemaTemplateRead(d *schema.ResourceData, m interface{}) error 
 		d.Set("tenant_id", "")
 		d.Set("name", "")
 		d.Set("display_name", "")
+		d.Set("template_type", "")
 	}
 
 	log.Printf("[DEBUG] %s: Read finished successfully", d.Id())
@@ -169,12 +182,13 @@ func resourceMSOSchemaTemplateUpdate(d *schema.ResourceData, m interface{}) erro
 	msoClient := m.(*client.Client)
 	schemaId := d.Get("schema_id").(string)
 	Name := d.Get("name").(string)
+	templateName := d.Get("template_type").(string)
 
 	if d.HasChange("display_name") {
 		tenantId := d.Get("tenant_id").(string)
 		displayName := d.Get("display_name").(string)
 
-		schematemplate := models.NewSchemaTemplate("replace", fmt.Sprintf("/templates/%s", Name), tenantId, Name, displayName)
+		schematemplate := models.NewSchemaTemplate("replace", fmt.Sprintf("/templates/%s", Name), tenantId, Name, displayName, templateName)
 
 		cont, err := msoClient.PatchbyID(fmt.Sprintf("api/v1/schemas/%s", schemaId), schematemplate)
 		if err != nil {
@@ -197,8 +211,9 @@ func resourceMSOSchemaTemplateDelete(d *schema.ResourceData, m interface{}) erro
 	tenantId := d.Get("tenant_id").(string)
 	templateName := d.Get("name").(string)
 	templateDisplayName := d.Get("display_name").(string)
+	templateType := d.Get("template_type").(string)
 
-	schematemplate := models.NewSchemaTemplate("remove", fmt.Sprintf("/templates/%s", templateName), tenantId, templateName, templateDisplayName)
+	schematemplate := models.NewSchemaTemplate("remove", fmt.Sprintf("/templates/%s", templateName), tenantId, templateName, templateDisplayName, templateType)
 
 	_, err := msoClient.PatchbyID(fmt.Sprintf("api/v1/schemas/%s", schemaId), schematemplate)
 	if err != nil {

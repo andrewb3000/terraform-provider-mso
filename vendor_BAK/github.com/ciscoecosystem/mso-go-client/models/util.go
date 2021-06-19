@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ciscoecosystem/mso-go-client/container"
+	"github.com/andrewb3000/mso-go-client/container"
 )
 
 func toStringMap(intf interface{}) map[string]interface{} {

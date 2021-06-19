@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ciscoecosystem/mso-go-client/client"
-	"github.com/ciscoecosystem/mso-go-client/container"
-	"github.com/ciscoecosystem/mso-go-client/models"
+	"github.com/andrewb3000/mso-go-client/client"
+	"github.com/andrewb3000/mso-go-client/container"
+	"github.com/andrewb3000/mso-go-client/models"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
